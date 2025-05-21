@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <title>My Web Page</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- jQuery -->
+    <!-- Tablesorter -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
+
+</head>
+
+<body>
+    <h3>Date Range Picker</h3>
+    <input type="text" name="daterange" value="01/01/2018 - 01/15/2018" />
+
+
+    <br><br><br>
+    <h3>Select 2</h3>
+    <select class="js-example-basic-single" name="ville">
+        <option value="">-- Sélectionnez une ville --</option>
+        <option value="agadir">Agadir</option>
+        <option value="casablanca">Casablanca</option>
+        <option value="chefchaouen">Chefchaouen</option>
+        <option value="dakhla">Dakhla</option>
+        <option value="el_jadida">El Jadida</option>
+        <option value="essaouira">Essaouira</option>
+        <option value="fes">Fès</option>
+        <option value="kenitra">Kénitra</option>
+        <option value="laayoune">Laâyoune</option>
+        <option value="marrakech">Marrakech</option>
+        <option value="meknes">Meknès</option>
+        <option value="nador">Nador</option>
+        <option value="ouarzazate">Ouarzazate</option>
+        <option value="oujda">Oujda</option>
+        <option value="rabat">Rabat</option>
+        <option value="safi">Safi</option>
+        <option value="sale">Salé</option>
+        <option value="settat">Settat</option>
+        <option value="tanger">Tanger</option>
+        <option value="taza">Taza</option>
+        <option value="tetouan">Tétouan</option>
+    </select>
+
+
+    <br><br><br>
+    <h3>Table Sorter</h3>
+    <table id="myTable" class="tablesorter">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Âge</th>
+                <th>Pays</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Marie</td>
+                <td>28</td>
+                <td>France</td>
+            </tr>
+            <tr>
+                <td>Jean</td>
+                <td>35</td>
+                <td>Belgique</td>
+            </tr>
+            <tr>
+                <td>Sami</td>
+                <td>22</td>
+                <td>Maroc</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function () {
+            $("#myTable").tablesorter();
+        });
+
+        $(document).ready(function () {
+            $('.js-example-basic-single').select2();
+        })
+        $(function () {
+            $('input[name="daterange"]').daterangepicker({
+                opens: 'left'
+            }, function (start, end, label) {
+                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
+        });
+
+    </script>
+</body>
+
+
+</html>
