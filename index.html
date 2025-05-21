@@ -74,6 +74,34 @@
     <!-- Script AJAX/JS viendra ici (version XMLHttpRequest + jQuery plus tard) -->
 </body>
 <script>
+    function get(id) {
+        xhr = new XMLHttpRequest();
+
+        //xhr.open("GET", "http://localhost/TP_AJAX/api?action=getAll", true);
+        const url = new URL("http://localhost/TP_AJAX/api");
+        url.searchParams.append("action", "get");
+        url.searchParams.append("id", id); // Ajouter le paramètre action dynamiquement
+        xhr.open("GET", url.toString(), true);
+
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const product = JSON.parse(xhr.responseText);
+                console.log(product);
+                document.getElementById("product-id").value = product.id;
+                document.getElementById("product-name").value = product.name;
+                document.getElementById("product-price").value = product.price;
+                document.getElementById("product-category").value = product.category;
+                document.getElementById("form-title").innerText = "Modifier le produit";
+                document.getElementById("submit-button").innerText = "Modifier";
+
+            }
+        }
+
+        xhr.send();
+    }
+
     function displayProducts() {
         xhr = new XMLHttpRequest();
 
@@ -124,7 +152,7 @@
         var categorie = document.getElementById("product-category").value;
         var id = document.getElementById("product-id").value;
 
-        if (id == '') {
+        if (id == '' && nom != '' && prix != '' && categorie != '') {
             xhr = new XMLHttpRequest();
             xhr.open("POST", "http://localhost/TP_AJAX/api", true);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -142,10 +170,7 @@
                         <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
                     </tr>`;
-
-                    displayProducts();
-                    // Recharger la liste des produits
-                    // Recharger la liste des produits
+                    tableBody.innerHTML = tr;
 
                 } else if (xhr.readyState === 4 && xhr.status === 500) {
                     const message = document.getElementById("message");
