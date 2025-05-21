@@ -74,22 +74,23 @@
     <!-- Script AJAX/JS viendra ici (version XMLHttpRequest + jQuery plus tard) -->
 </body>
 <script>
-    xhr = new XMLHttpRequest();
+    function displayProducts() {
+        xhr = new XMLHttpRequest();
 
-    //xhr.open("GET", "http://localhost/TP_AJAX/api?action=getAll", true);
-    const url = new URL("http://localhost/TP_AJAX/api");
-    url.searchParams.append("action", "getAll"); // Ajouter le paramètre action dynamiquement
-    xhr.open("GET", url.toString(), true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const products = JSON.parse(xhr.responseText);
-            tableBody = document.getElementById("product-table-body");
-            console.log(tableBody);
-            tr = "" // Vider le tableau avant d'ajouter les nouvelles lignes
-            // Vider le tableau avant d'ajouter les nouvelles lignes
-            for (product of products) {
-                tr += `<tr id="product-${product.id}">
+        //xhr.open("GET", "http://localhost/TP_AJAX/api?action=getAll", true);
+        const url = new URL("http://localhost/TP_AJAX/api");
+        url.searchParams.append("action", "getAll"); // Ajouter le paramètre action dynamiquement
+        xhr.open("GET", url.toString(), true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const products = JSON.parse(xhr.responseText);
+                tableBody = document.getElementById("product-table-body");
+                console.log(tableBody);
+                tr = "" // Vider le tableau avant d'ajouter les nouvelles lignes
+                // Vider le tableau avant d'ajouter les nouvelles lignes
+                for (product of products) {
+                    tr += `<tr id="product-${product.id}">
                     <td>${product.id}</td>
                     <td>${product.name}</td>
                     <td>${product.price}</td>
@@ -99,21 +100,23 @@
                         <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
                     </tr>`;
 
+                }
+                tableBody.innerHTML = tr;
+            } else if (xhr.readyState === 4 && xhr.status === 404) {
+                const message = document.getElementById("message");
+                message.innerHTML = '<div class="alert alert-danger">Erreur: Ressource non trouvée.</div>';
+            } else if (xhr.readyState === 4 && xhr.status === 500) {
+                const message = document.getElementById("message");
+                message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
+            } else if (xhr.readyState === 4) {
+                const message = document.getElementById("message");
+                message.innerHTML = '<div class="alert alert-danger">Erreur: Problème de connexion.</div>';
             }
-            tableBody.innerHTML = tr;
-        } else if (xhr.readyState === 4 && xhr.status === 404) {
-            const message = document.getElementById("message");
-            message.innerHTML = '<div class="alert alert-danger">Erreur: Ressource non trouvée.</div>';
-        } else if (xhr.readyState === 4 && xhr.status === 500) {
-            const message = document.getElementById("message");
-            message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
-        } else if (xhr.readyState === 4) {
-            const message = document.getElementById("message");
-            message.innerHTML = '<div class="alert alert-danger">Erreur: Problème de connexion.</div>';
         }
-    }
 
-    xhr.send();
+        xhr.send();
+    }
+    displayProducts();
 
     document.getElementById("submit-button").addEventListener("click", function () {
         var nom = document.getElementById("product-name").value;
@@ -139,6 +142,8 @@
                         <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
                     </tr>`;
+
+                    displayProducts();
                     // Recharger la liste des produits
                     // Recharger la liste des produits
 
