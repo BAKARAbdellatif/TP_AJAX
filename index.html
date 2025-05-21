@@ -64,6 +64,7 @@
                         <input type="text" class="form-control" name="category" id="product-category" required>
                     </div>
                     <button type="button" class="btn btn-success w-100" id="submit-button">Ajouter</button>
+                    <button type="button" class="btn btn-secondary w-100 mt-2" onclick="resetForm()">Annuler</button>
                 </form>
             </div>
         </div>
@@ -151,11 +152,10 @@
         var prix = document.getElementById("product-price").value;
         var categorie = document.getElementById("product-category").value;
         var id = document.getElementById("product-id").value;
-
+        xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost/TP_AJAX/api", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         if (id == '' && nom != '' && prix != '' && categorie != '') {
-            xhr = new XMLHttpRequest();
-            xhr.open("POST", "http://localhost/TP_AJAX/api", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const product = JSON.parse(xhr.responseText);
@@ -171,6 +171,7 @@
                         <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
                     </tr>`;
                     tableBody.innerHTML = tr;
+                    resetForm();
 
                 } else if (xhr.readyState === 4 && xhr.status === 500) {
                     const message = document.getElementById("message");
@@ -180,11 +181,44 @@
 
             const data = "action=add&name=" + nom + "&price=" + prix + "&category=" + categorie;
             xhr.send(data);
-        } else {
-            console.log('modification');
+        } else if (id != '' && nom != '' && prix != '' && categorie != '') {
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    product = data.produit;
+                    document.getElementById("product-form").reset();
+                    tr = `<tr id="product-${product.id}">
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.category}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                    </tr>`;
+                    // Créer un élément DOM à partir du HTML et remplacer la ligne existante
+                    $("#product-" + product.id).replaceWith(tr);
+                    resetForm();
+
+                } else if (xhr.readyState === 4 && xhr.status === 500) {
+                    const message = document.getElementById("message");
+                    message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
+                }
+            }
+            const data = "action=update&name=" + nom + "&price=" + prix + "&category=" + categorie + "&id=" + id;
+            xhr.send(data);
         }
 
+
+
     });
+
+    function resetForm() {
+        document.getElementById("product-form").reset();
+        document.getElementById("product-id").value = '';
+        document.getElementById("form-title").innerText = "Ajouter un produit";
+        document.getElementById("submit-button").innerText = "Ajouter";
+    }
 </script>
 
 </html>
