@@ -78,200 +78,175 @@
 <script>
     function deleteProduct(id) {
         if (confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
-            xhr = new XMLHttpRequest();
-            xhr.open("POST", "http://localhost/tp_ajax/api", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status == 200) {
-                    const data = JSON.parse(xhr.responseText)
+            $.ajax({
+                url: "http://localhost/TP_AJAX/api",
+                type: "POST",
+                data: { action: "delete", id: id },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
                     document.getElementById("product-" + id).remove();
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
                 }
-            }
-            xhr.send("action=delete&id=" + id);
+            });
         }
     }
 
     function get(id) {
-        xhr = new XMLHttpRequest();
-
-        //xhr.open("GET", "http://localhost/TP_AJAX/api?action=getAll", true);
-        const url = new URL("http://localhost/TP_AJAX/api");
-        url.searchParams.append("action", "get");
-        url.searchParams.append("id", id); // Ajouter le paramètre action dynamiquement
-        xhr.open("GET", url.toString(), true);
-
-        xhr.setRequestHeader("Content-Type", "application/json");
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                const product = JSON.parse(xhr.responseText);
+        $.ajax({
+            url: "http://localhost/TP_AJAX/api",
+            type: "GET",
+            data: { action: "get", id: id },
+            dataType: "json",
+            success: function (product) {
                 console.log(product);
-                document.getElementById("product-id").value = product.id;
-                document.getElementById("product-name").value = product.name;
-                document.getElementById("product-price").value = product.price;
-                document.getElementById("product-category").value = product.category;
-                document.getElementById("form-title").innerText = "Modifier le produit";
-                document.getElementById("submit-button").innerText = "Modifier";
-
+                $("#product-id").val(product.id);
+                $("#product-name").val(product.name);
+                $("#product-price").val(product.price);
+                $("#product-category").val(product.category);
+                $("#form-title").text("Modifier le produit");
+                $("#submit-button").text("Modifier");
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
             }
-        }
-
-        xhr.send();
+        });
     }
 
     function displayProducts() {
-        xhr = new XMLHttpRequest();
 
-        //xhr.open("GET", "http://localhost/TP_AJAX/api?action=getAll", true);
-        const url = new URL("http://localhost/TP_AJAX/api");
-        url.searchParams.append("action", "getAll"); // Ajouter le paramètre action dynamiquement
-        xhr.open("GET", url.toString(), true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                const products = JSON.parse(xhr.responseText);
-                tableBody = document.getElementById("product-table-body");
-                console.log(tableBody);
-                tr = "" // Vider le tableau avant d'ajouter les nouvelles lignes
-                // Vider le tableau avant d'ajouter les nouvelles lignes
+        $.ajax({
+            url: "http://localhost/TP_AJAX/api",
+            type: "GET",
+            data: { action: "getAll" },
+            dataType: "json",
+            success: function (products) {
+                tableBody = $("#product-table-body");
+
+                tr = "";
                 for (product of products) {
                     tr += `<tr id="product-${product.id}">
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>${product.price}</td>
-                    <td>${product.category}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
-                    </tr>`;
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.category}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                        </td>
+                        </tr>`;
 
                 }
-                tableBody.innerHTML = tr;
-            } else if (xhr.readyState === 4 && xhr.status === 404) {
-                const message = document.getElementById("message");
-                message.innerHTML = '<div class="alert alert-danger">Erreur: Ressource non trouvée.</div>';
-            } else if (xhr.readyState === 4 && xhr.status === 500) {
-                const message = document.getElementById("message");
-                message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
-            } else if (xhr.readyState === 4) {
-                const message = document.getElementById("message");
-                message.innerHTML = '<div class="alert alert-danger">Erreur: Problème de connexion.</div>';
+                tableBody.html(tr);
             }
-        }
-
-        xhr.send();
+            , error: function (xhr, status, error) {
+                console.errpr(error);
+            }
+        });
     }
     displayProducts();
 
-    document.getElementById("submit-button").addEventListener("click", function () {
-        var nom = document.getElementById("product-name").value;
-        var prix = document.getElementById("product-price").value;
-        var categorie = document.getElementById("product-category").value;
-        var id = document.getElementById("product-id").value;
-        xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost/TP_AJAX/api", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        if (id == '' && nom != '' && prix != '' && categorie != '') {
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const product = JSON.parse(xhr.responseText);
-                    console.log(product);
-                    document.getElementById("product-form").reset();
-                    tr += `<tr id="product-${product.id}">
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>${product.price}</td>
-                    <td>${product.category}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
-                    </tr>`;
-                    tableBody.innerHTML = tr;
-                    resetForm();
-
-                } else if (xhr.readyState === 4 && xhr.status === 500) {
-                    const message = document.getElementById("message");
-                    message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
-                }
-            }
-
-            const data = "action=add&name=" + nom + "&price=" + prix + "&category=" + categorie;
-            xhr.send(data);
-        } else if (id != '' && nom != '' && prix != '' && categorie != '') {
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const data = JSON.parse(xhr.responseText);
-                    product = data.produit;
-                    document.getElementById("product-form").reset();
+    $("#submit-button").click(function () {
+        var id = $("#product-id").val();
+        var name = $("#product-name").val();
+        var price = $("#product-price").val();
+        var category = $("#product-category").val();
+        if (id == '' && name != '' && price != '' && category != '') {
+            $.ajax({
+                url: "http://localhost/TP_AJAX/api",
+                type: "POST",
+                data: { action: "add", name: name, price: price, category: category },
+                dataType: "json",
+                success: function (product) {
                     tr = `<tr id="product-${product.id}">
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>${product.price}</td>
-                    <td>${product.category}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
-                    </tr>`;
-                    // Créer un élément DOM à partir du HTML et remplacer la ligne existante
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.category}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                        </td>
+                        </tr>`;
+                    $("#product-table-body").append(tr);
+                    resetForm();
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        } else if (id != '' && name != '' && price != '' && category != '') {
+            $.ajax({
+                url: "http://localhost/TP_AJAX/api",
+                type: "POST",
+                data: { action: "update", id: id, name: name, price: price, category: category },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data.produit);
+                    product = data.produit;
+                    tr = `<tr id="product-${product.id}">
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.category}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                        </td>
+                        </tr>`;
+
                     $("#product-" + product.id).replaceWith(tr);
                     resetForm();
 
-                } else if (xhr.readyState === 4 && xhr.status === 500) {
-                    const message = document.getElementById("message");
-                    message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
                 }
-            }
-            const data = "action=update&name=" + nom + "&price=" + prix + "&category=" + categorie + "&id=" + id;
-            xhr.send(data);
+            });
         }
-
-
-
     });
 
     function resetForm() {
-        document.getElementById("product-form").reset();
-        document.getElementById("product-id").value = '';
-        document.getElementById("form-title").innerText = "Ajouter un produit";
-        document.getElementById("submit-button").innerText = "Ajouter";
+        $("#product-form")[0].reset();
+        $("#product-id").val('');
+        $("#form-title").text("Ajouter un produit");
+        $("#submit-button").text("Ajouter");
     }
 
-    document.querySelectorAll(".filtreInput").forEach(input => {
-        input.addEventListener('keyup', function () {
-            name = document.getElementById("name").value;
-            min_price = document.getElementById("min_price").value;
-            max_price = document.getElementById("max_price").value;
 
-            xhr = new XMLHttpRequest();
-            xhr.open("POST", "http://localhost/TP_AJAX/api", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    $(".filtreInput").keyup(function () {
+        name = $("#name").val();
+        min_price = $("#min_price").val();
+        max_price = $("#max_price").val();
+        $.ajax({
+            url: "http://localhost/TP_AJAX/api",
+            type: "POST",
+            data: { action: "filtrer", name: name, min_price: min_price, max_price: max_price },
+            dataType: "json",
+            success: function (products) {
+                tableBody = $("#product-table-body");
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status == 200) {
-                    products = JSON.parse(xhr.responseText);
-                    tableBody = document.getElementById("product-table-body");
-                    console.log(tableBody);
-                    tr = "" // Vider le tableau avant d'ajouter les nouvelles lignes
-                    // Vider le tableau avant d'ajouter les nouvelles lignes
-                    for (product of products) {
-                        tr += `<tr id="product-${product.id}">
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>${product.price}</td>
-                    <td>${product.category}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
-                    </tr>`;
+                tr = "";
+                for (product of products) {
+                    tr += `<tr id="product-${product.id}">
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price}</td>
+                        <td>${product.category}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                        </td>
+                        </tr>`;
 
-                    }
-                    tableBody.innerHTML = tr;
                 }
+                tableBody.html(tr);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
             }
-
-            xhr.send("action=filtrer&name=" + name + "&min_price=" + min_price + "&max_price=" + max_price);
-
         });
     });
 </script>
