@@ -34,6 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             http_response_code(400);
             echo json_encode(["error" => "Invalid input"]);
         }
+    } else if ($_POST['action'] == 'filtrer') {
+        require_once 'filtrer.php';
+        $params = [];
+        if (isset($_POST['name']) && $_POST['name'] != '') {
+            $params['name LIKE ?'] = $_POST['name'] . "%";
+        }
+        if (isset($_POST['min_price']) && $_POST['min_price'] != '') {
+            $params['price >= ?'] = $_POST['min_price'];
+        }
+        if (isset($_POST['max_price']) && $_POST['max_price'] != '') {
+            $params['price <= ?'] = $_POST['max_price'];
+        }
+        filtrer($params);
     } else {
         http_response_code(400);
         echo json_encode(["error" => "Invalid action"]);

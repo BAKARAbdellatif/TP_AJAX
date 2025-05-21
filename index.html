@@ -16,18 +16,19 @@
             <div class="col-md-8">
                 <!-- Filtre -->
                 <form id="filter-form" class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" name="name" placeholder="Nom du produit">
+                    <div class="col">
+                        <input type="text" class="form-control filtreInput" name="name" id="name"
+                            placeholder="Nom du produit">
                     </div>
-                    <div class="col-md-3">
-                        <input type="number" class="form-control" name="min_price" placeholder="Prix min">
+                    <div class="col">
+                        <input type="number" class="form-control filtreInput" name="min_price" id="min_price"
+                            placeholder="Prix min">
                     </div>
-                    <div class="col-md-3">
-                        <input type="number" class="form-control" name="max_price" placeholder="Prix max">
+                    <div class="col">
+                        <input type="number" class="form-control filtreInput" name="max_price" id="max_price"
+                            placeholder="Prix max">
                     </div>
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Filtrer</button>
-                    </div>
+
                 </form>
                 <!-- Tableau -->
                 <table class="table table-bordered" id="product-table">
@@ -235,6 +236,44 @@
         document.getElementById("form-title").innerText = "Ajouter un produit";
         document.getElementById("submit-button").innerText = "Ajouter";
     }
+
+    document.querySelectorAll(".filtreInput").forEach(input => {
+        input.addEventListener('keyup', function () {
+            name = document.getElementById("name").value;
+            min_price = document.getElementById("min_price").value;
+            max_price = document.getElementById("max_price").value;
+
+            xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost/TP_AJAX/api", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status == 200) {
+                    products = JSON.parse(xhr.responseText);
+                    tableBody = document.getElementById("product-table-body");
+                    console.log(tableBody);
+                    tr = "" // Vider le tableau avant d'ajouter les nouvelles lignes
+                    // Vider le tableau avant d'ajouter les nouvelles lignes
+                    for (product of products) {
+                        tr += `<tr id="product-${product.id}">
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.category}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                    </tr>`;
+
+                    }
+                    tableBody.innerHTML = tr;
+                }
+            }
+
+            xhr.send("action=filtrer&name=" + name + "&min_price=" + min_price + "&max_price=" + max_price);
+
+        });
+    });
 </script>
 
 </html>

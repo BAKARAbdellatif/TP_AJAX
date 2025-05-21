@@ -1,4 +1,5 @@
 -- Création de la base de données
+DROP DATABASE IF EXISTS ajax_crud;
 CREATE DATABASE IF NOT EXISTS ajax_crud CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- Utilisation de la base de données
