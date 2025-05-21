@@ -40,7 +40,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="product-table-body">
                         <!-- Lignes générées dynamiquement -->
                     </tbody>
                 </table>
@@ -84,11 +84,36 @@
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             const products = JSON.parse(xhr.responseText);
-            const tableBody = document.querySelector("#product-table tbody");
+            tableBody = document.getElementById("product-table-body");
+            console.log(tableBody);
+            tr = "" // Vider le tableau avant d'ajouter les nouvelles lignes
+            // Vider le tableau avant d'ajouter les nouvelles lignes
+            for (product of products) {
+                tr += `<tr id="product-${product.id}">
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td>${product.category}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                    </tr>`;
+
+            }
+            tableBody.innerHTML = tr;
+        } else if (xhr.readyState === 4 && xhr.status === 404) {
+            const message = document.getElementById("message");
+            message.innerHTML = '<div class="alert alert-danger">Erreur: Ressource non trouvée.</div>';
+        } else if (xhr.readyState === 4 && xhr.status === 500) {
+            const message = document.getElementById("message");
+            message.innerHTML = '<div class="alert alert-danger">Erreur: Problème interne du serveur.</div>';
+        } else if (xhr.readyState === 4) {
+            const message = document.getElementById("message");
+            message.innerHTML = '<div class="alert alert-danger">Erreur: Problème de connexion.</div>';
         }
     }
-    xhr.send();
 
+    xhr.send();
 </script>
 
 </html>
