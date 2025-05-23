@@ -1,5 +1,5 @@
 <?php
-function add($name, $categorie, $prix)
+function add($name, $prix, $categorie)
 {
     $sql = "INSERT INTO products (name, category, price) VALUES (:name, :category, :price)";
     $db = getDBConnexion();

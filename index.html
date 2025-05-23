@@ -35,6 +35,49 @@
             }
 
         })
+
+
+
+        $("#submit-button").click(function () {
+            id = $("#product-id").val()
+            name = $("#product-name").val()
+            price = $("#product-price").val()
+            category = $("#product-category").val()
+            if (isNaN(id)) {
+                alert('edit')
+            } else {
+                action = "add"
+                $.ajax({
+                    data: {
+                        action: action,
+                        name: name,
+                        price: price,
+                        category: category
+                    },
+                    type: 'POST',
+                    url: "api.php",
+                    dataType: 'json',
+                    success: function (product) {
+                        tr = `<tr id="product-${product.id}">
+                            <td>${product.id}</td>
+                            <td>${product.name}</td>
+                            <td>${product.price}</td>
+                            <td>${product.category}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                            </td>
+                        </tr>`;
+                        $("#product-table-body").append(tr)
+                        resetForm()
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+
+                })
+            }
+        })
     });
 
 </script>
@@ -106,8 +149,14 @@
 
     <!-- Script AJAX/JS viendra ici (version XMLHttpRequest + jQuery plus tard) -->
 </body>
-<script>
 
+<script>
+    function resetForm() {
+        alert("it works")
+        $("#form-title").text("Ajouter un produit")
+        $("#submit-button").text("Ajouter")
+        $("#product-form")[0].reset()
+    }
 </script>
 
 </html>
