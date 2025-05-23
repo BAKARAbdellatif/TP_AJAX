@@ -17,16 +17,7 @@
             success: function (products) {
                 let tr = "";
                 for (product of products) {
-                    tr += `<tr id="product-${product.id}">
-                            <td>${product.id}</td>
-                            <td>${product.name}</td>
-                            <td>${product.price}</td>
-                            <td>${product.category}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
-                            </td>
-                        </tr>`;
+                    tr += getProductRow(product);
                 }
                 $("#product-table-body").html(tr)
             },
@@ -43,8 +34,29 @@
             name = $("#product-name").val()
             price = $("#product-price").val()
             category = $("#product-category").val()
-            if (isNaN(id)) {
-                alert('edit')
+            if (id) {
+                action = "update";
+                $.ajax({
+                    data: {
+                        action: action,
+                        id: id,
+                        name: name,
+                        price: price,
+                        category: category
+                    },
+                    url: "api.php",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (response) {
+                        product = response.produit
+                        tr = getProductRow(product)
+                        $("#product-" + product.id).replaceWith(tr)
+                        resetForm()
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                })
             } else {
                 action = "add"
                 $.ajax({
@@ -58,16 +70,7 @@
                     url: "api.php",
                     dataType: 'json',
                     success: function (product) {
-                        tr = `<tr id="product-${product.id}">
-                            <td>${product.id}</td>
-                            <td>${product.name}</td>
-                            <td>${product.price}</td>
-                            <td>${product.category}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
-                            </td>
-                        </tr>`;
+                        tr = getProductRow(product)
                         $("#product-table-body").append(tr)
                         resetForm()
                     },
@@ -152,10 +155,46 @@
 
 <script>
     function resetForm() {
-        alert("it works")
         $("#form-title").text("Ajouter un produit")
         $("#submit-button").text("Ajouter")
         $("#product-form")[0].reset()
+    }
+
+    function get(id) {
+        $.ajax({
+            data: {
+                action: "get",
+                id: id
+            },
+            url: "api.php",
+            type: "GET",
+            dataType: "json",
+            success: function (product) {
+                $("#product-id").val(product.id)
+                $("#product-name").val(product.name)
+                $("#product-price").val(product.price)
+                $("#product-category").val(product.category)
+                $("#form-title").text("Modifier le produit")
+                $("#submit-button").text("Modifier")
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        })
+    }
+
+    function getProductRow(product) {
+        tr = `<tr id="product-${product.id}">
+                            <td>${product.id}</td>
+                            <td>${product.name}</td>
+                            <td>${product.price}</td>
+                            <td>${product.category}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="get(${product.id})">Modifier</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                            </td>
+                        </tr>`;
+        return tr;
     }
 </script>
 
