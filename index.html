@@ -29,6 +29,34 @@
 
         })
 
+        $(".filtreInput").keyup(function () {
+            name = $("#name").val()
+            min_price = $("#min_price").val()
+            max_price = $("#max_price").val()
+
+            $.ajax({
+                url: "api.php",
+                type: 'POST',
+                data: {
+                    action: "filtrer",
+                    name: name,
+                    min_price: min_price,
+                    max_price: max_price
+                },
+                dataType: 'json',
+                success: function (products) {
+                    let tr = "";
+                    for (product of products) {
+                        tr += getProductRow(product);
+                    }
+                    $("#product-table-body").html(tr)
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            })
+        })
+
 
 
         $("#submit-button").click(function () {
