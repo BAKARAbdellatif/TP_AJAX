@@ -20,6 +20,8 @@
                     tr += getProductRow(product);
                 }
                 $("#product-table-body").html(tr)
+
+
             },
             error: function (xhr, status, error) {
                 console.error(error);
@@ -51,6 +53,7 @@
                         product = response.produit
                         tr = getProductRow(product)
                         $("#product-" + product.id).replaceWith(tr)
+
                         resetForm()
                     },
                     error: function (xhr, status, error) {
@@ -72,6 +75,7 @@
                     success: function (product) {
                         tr = getProductRow(product)
                         $("#product-table-body").append(tr)
+
                         resetForm()
                     },
                     error: function (xhr, status, error) {
@@ -195,6 +199,31 @@
                             </td>
                         </tr>`;
         return tr;
+    }
+
+
+    function deleteProduct(id) {
+        if (confirm('Êtes-vous sur de bien vouloir supprimer ce produit ?')) {
+            $.ajax({
+                data: {
+                    action: "delete",
+                    id: id
+                },
+                url: "api.php",
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        $("#product-" + id).remove();
+                    } else {
+                        alert(response.error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            })
+        }
     }
 </script>
 
