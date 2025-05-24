@@ -135,6 +135,7 @@
                     product = JSON.parse(xhr.responseText)
                     tbody = document.getElementById("product-table-body");
                     tbody.innerHTML += getHTMLProductRow(product);
+                    resetForm()
                 }
             }
 
@@ -144,6 +145,24 @@
 
         }
     });
+
+    function editProduct(id) {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", `http://localhost/TP_AJAX/api.php?action=get&id=${id}`, true);
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                product = JSON.parse(xhr.responseText);
+                document.getElementById("product-id").value = product.id;
+                document.getElementById("product-name").value = product.name;
+                document.getElementById("product-price").value = product.price;
+                document.getElementById("product-category").value = product.category;
+                document.getElementById("form-title").innerText = "Modifier le produit";
+                document.getElementById("submit-button").innerText = "Modifier";
+            }
+        }
+        xhr.send();
+    }
 
 </script>
 
