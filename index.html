@@ -110,6 +110,41 @@
         }
     }
     xhr.send()
+
+    function resetForm() {
+        document.getElementById("product-form").reset();
+        document.getElementById("form-title").innerText = "Ajouter un produit";
+        document.getElementById("submit-button").innerText = "Ajouter";
+    }
+    document.getElementById("submit-button").addEventListener("click", function () {
+        id = document.getElementById("product-id").value;
+        name = document.getElementById("product-name").value;
+        price = document.getElementById("product-price").value;
+        category = document.getElementById("product-category").value;
+
+        if (id) {
+            alert("modification")
+        } else {
+            action = "add"
+            xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost/TP_AJAX/api.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status == 200) {
+                    product = JSON.parse(xhr.responseText)
+                    tbody = document.getElementById("product-table-body");
+                    tbody.innerHTML += getHTMLProductRow(product);
+                }
+            }
+
+            params = `action=${action}&name=${name}&price=${price}&category=${category}`;
+            xhr.send(params);
+
+
+        }
+    });
+
 </script>
 
 </html>
