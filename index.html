@@ -80,14 +80,33 @@
 </body>
 
 <script>
+    function getHTMLProductRow(product) {
+        return `<tr id="product-${product.id}">
+                            <td>${product.id}</td>
+                            <td>${product.name}</td>
+                            <td>${product.price}</td>
+                            <td>${product.category}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="editProduct(${product.id})">Modifier</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Supprimer</button>
+                            </td>
+                        </tr>`
+    }
     xhr = new XMLHttpRequest();
 
-    xhr.open("GET", "http://localhost/TP_AJAX/api.php", true)
+    xhr.open("GET", "http://localhost/TP_AJAX/api.php?action=getAll", true)
 
     xhr.onreadystatechange = function () {
         // readyState = 4, status = 200
         if (xhr.readyState === 4 && xhr.status === 200) {
-            response = xhr.responseText
+            products = JSON.parse(xhr.responseText)
+            tbody = document.getElementById("product-table-body")
+            tr = ""
+            for (product of products) {
+                tr += getHTMLProductRow(product)
+            }
+            tbody.innerHTML = tr
+
         }
     }
     xhr.send()
